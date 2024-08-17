@@ -154,15 +154,15 @@ export class MicrocreditService {   //Clase responsable de coordinar el proceso 
 
 **¿Qué es?**
 
-El principio de Abierto/Cerrado establece que una clase debe estar abierta a la extensión pero cerrada a la modificación. Esto significa que deberíamos poder añadir nuevas funcionalidades sin alterar el código existente.
+El principio de Abierto/Cerrado establece que una clase debe estar abierta a la extensión pero cerrada a la modificación. Esto significa que deberíamos poder añadir nuevas funcionalidades sin alterar el código existente. (Esto significa que deberíamos poder extender el comportamiento de una clase sin necesidad de modificar su código fuente).
 
 #### Sin OCP (No se debería hacer):
 
 ```typescript
 @Injectable()
-export class CreditCalculationService {
-  calculateInterestRate(user: User): number {
-    if (user.creditScore > 700) {
+export class CreditCalculationService {  //Clase que se encarga del cálculo de la tasa de interés basada en la puntuación de crédito del usuario.
+  calculateInterestRate(user: User): number {  //Método que recibe un objeto User y devuelve un número que representa la tasa de interés
+    if (user.creditScore > 700) { 
       return 5;
     } else if (user.creditScore > 500) {
       return 10;
@@ -173,44 +173,53 @@ export class CreditCalculationService {
 }
 ```
 
+**ANÁLISIS DE POR QUE NO SE CUMPLE EL OCP EN EL CÓDIGO ANTERIOR Y CONSECUENCIAS**
+
 Este código viola el principio OCP porque cada vez que necesitamos modificar la lógica de cálculo de interés, debemos alterar el código existente.
+
+En este ejemplo, cada vez que se requiere cambiar la lógica de cálculo de la tasa de interés(por ejemplo, añadir una nueva condición o cambiar las tasas para diferentes rangos de creditScore), se necesita modificar directamente el método calculateInterestRate de la clase CreditCalculationService.
+
+Esto hace que la clase sea menos flexible y más propensa a errores, ya que cada modificación del código existente podría introducir errores no deseados. Además, dificulta el mantenimiento y la escalabilidad del código. 
+
 
 #### Con OCP (Así se debería hacer):
 
 ```typescript
-interface InterestRateStrategy {
+interface InterestRateStrategy {  //Define una interface que tiene un método calculate para calcular la tasa de interés. Esta interfaz establece un contrato que todas las estrategias de cálculo de interés deben cumplir. 
   calculate(user: User): number;
 }
 
 @Injectable()
-export class StandardInterestRateStrategy implements InterestRateStrategy {
-  calculate(user: User): number {
+export class StandardInterestRateStrategy implements InterestRateStrategy { //Define una clase StandardInterestRateStrategy que implementa la interfaz InterestRateStrategy. Esta clase calcula la tasa de interés estándar. 
+  calculate(user: User): number { //Implementa el método calculate de la interfaz 
     return user.creditScore > 700 ? 5 : 15;
   }
 }
 
 @Injectable()
-export class PremiumInterestRateStrategy implements InterestRateStrategy {
-  calculate(user: User): number {
+export class PremiumInterestRateStrategy implements InterestRateStrategy { //Se define otra clase que también implementa la interfaz InterestRateStrategy. Esta clase calcula una tasa de interés diferente para usuarios premium. 
+  calculate(user: User): number { //Implementa el método calculate de la interfaz 
     return user.creditScore > 700 ? 3 : 10;
   }
 }
 
 @Injectable()
-export class CreditCalculationService {
-  private strategy: InterestRateStrategy;
+export class CreditCalculationService {   //Clase responsable de utilizar una estrategia de cálculo de interés inyectada
+  private strategy: InterestRateStrategy; //Declara una propiedad privada strategy de tipo InterestRateStrategy que contendrá la estrategia de cálculo a utilizar. 
 
-  constructor(strategy: InterestRateStrategy) {
+  constructor(strategy: InterestRateStrategy) { //El constructor recibe una instancia de InterestRateStrategy y la asigna a la propiedad strategy. 
     this.strategy = strategy;
   }
 
-  calculateInterestRate(user: User): number {
+  calculateInterestRate(user: User): number {  //Método que delega el cálculo de la tasa de interés a la estrategia inyectada. 
     return this.strategy.calculate(user);
   }
 }
 ```
 
 Al utilizar una estrategia de cálculo de interés, podemos añadir nuevas estrategias sin modificar el código existente, haciendo que la clase esté abierta para la extensión pero cerrada a la modificación.
+
+Este enfoque garantiza que la clase CreditCalculationService esté abierta para la extensión (puedes añadir nuevas estrategias) pero cerrada para la modificación (no necesitas cambiar la clase para soportar nuevas estrategias).
 
 ### 3. Principio L (Liskov Substitution Principle) - Principio de Sustitución de Liskov
 
