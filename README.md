@@ -1,1 +1,1 @@
-# workshop1-Optimizaci-n-de-la-Funcionalidad-de-Microcr-ditos-Personalizados-en-una-Fintech-con-NestJS
+# workshop1-Optimizacion-de-la-Funcionalidad-de-Microcreditos-Personalizados-en-una-Fintech-con-NestJS
