@@ -230,46 +230,58 @@ El principio de Sustitución de Liskov establece que los objetos de una clase ba
 #### Sin LSP (No se debería hacer):
 
 ```typescript
-class BasicMicrocredit extends Microcredit {
-  constructor(userId: string, amount: number) {
-    super(userId, amount, 'PENDING');
+class BasicMicrocredit extends Microcredit { //Define la clase BasicMicrocredit que extiende de Microcredit. Esta una subclase que hereda todas la propiedades y métodos de Microcredit.
+  constructor(userId: string, amount: number) {  //Constructor de BasicMicrocredit que recibe userId y amount como parametros. 
+    super(userId, amount, 'PENDING'); //Llama al constructor de la clase base Microcredit pasando los argumentos userId, amount y el estado inicial PENDING. 
   }
 
   // Sobrescribe un método de la clase base, pero no funciona con todas las subclases
-  override apply(): void {
+  override apply(): void {   //Sobreescribe el método apply de la clase base Microcredit para implementar lógica específica para BasicMicrocredit. 
     // Lógica específica para microcréditos básicos
   }
 }
 
-class AdvancedMicrocredit extends Microcredit {
-  constructor(userId: string, amount: number) {
-    super(userId, amount, 'APPROVED');
+class AdvancedMicrocredit extends Microcredit {  //Define la clase AdvancedMicrocredit que también extiende de Microcredit 
+  constructor(userId: string, amount: number) {  //Constructor de AdvancedMicrocredit que recibe userId y amount como parametros.
+    super(userId, amount, 'APPROVED');  //Llama al constructor de la clase base Microcredit pasando los argumentos userId, amount y el estado inicial APPROVED. 
   }
 
-  override apply(): void {
+  override apply(): void {  //Sobreescribe el método apply de la clase base Microcredit para implementar lógica específica para AdvancedMicrocredit
     // Lógica específica para microcréditos avanzados
   }
 }
 ```
 
+**ANÁLISIS DE POR QUE NO SE CUMPLE EL PRINCIPIO L EN EL CÓDIGO ANTERIOR Y CONSECUENCIAS**
+
 Este código rompe el principio de Liskov porque las subclases modifican el comportamiento de la clase base de manera que podría no ser esperado por otras partes del código.
+Es decir, si una clase base Microcredit es sustituida por una de sus subclases BasicMicrocredit o AdvancedMicrocredit el comportamiento del programa no debe cambiar de manera inesperada.
+
+En este ejemplo, las subclases BasicMicrocredit y AdvancedMicrocredit sobreescriben el método apply de Microcredit, implementando lógica específica que puede no ser esperada por otras partes del código que utilizan Microcredit. Esto significa que si un cliente del código espera un comportamiento genérico definido en Microcredit, pero recibe un BasicMicrocredit o AdvancedMicrocredit, podría encontrarse con un comportamiento inesperado. 
+
+Si el método apply se espera que tenga un comportamiento uniforme en todas las instancias de Microcredit, al sobrescribirlo en las subclases se rompe esta expectativa, lo que puede llevar a errores en el código que dependa de la clase base. 
 
 #### Con LSP (Así se debería hacer):
 
 ```typescript
-class Microcredit {
-  apply(): void {
+class Microcredit {  //Define la clase base Microcredit con un método apply que contiene la lógica genérica para aplicar un microcrédito. 
+  apply(): void {    //Método que contiene la lógica genérica. Todas las subclases heredan este método y su comportamiento, manteniendo una consistencia en el funcionamiento. 
     // Lógica genérica para aplicar un microcrédito
   }
 }
 
-class BasicMicrocredit extends Microcredit {
-  // No es necesario sobrescribir el método apply si no altera el comportamiento
+class BasicMicrocredit extends Microcredit {  //La clase BasicMicrocredit hereda de Microcredit pero no sobrescribe el método apply. Esto asegura que el comportamiento esperado del método apply se mantenga.
+// No es necesario sobrescribir el método apply si no altera el comportamiento
 }
 
-class AdvancedMicrocredit extends Microcredit {
-  // Aquí podrías extender el comportamiento si es necesario, pero sin romper el contrato
+class AdvancedMicrocredit extends Microcredit {  //Similar a BasicMicrocredit, AdvancedMicrocredit hereda de Microcredit y podría extender el comportamiento si es necesario, pero sin romper el contrato esperado del método apply.
+// Aquí podrías extender el comportamiento si es necesario, pero sin romper el contrato
 }
 ```
-
 Las subclases deben respetar el comportamiento de la clase base, garantizando que cualquier clase que sustituya a la clase base mantendrá el comportamiento esperado.
+
+¿POR QUÉ CUMPLE CON LSP?
+
+Consistencia: Mantener el método apply en la clase base asegura que todas la subclases tengan un comportamiento consistente y predecible.
+
+Extensibilidad sin rotura: Si una subclase necesita extender el comportamiento, puede hacerlo sin alterar el contrato esperado del método apply. Esto permite que las subclases sean utilizadas de manera intercambiable con la clase base sin causar comportamientos inesperados. 
