@@ -332,6 +332,57 @@ interface PaymentProcessing{
 ### 5. Principio DIP (Dependency Inversion Principle ) - Principio de Inversión de Dependencias
 
 ***¿Qué es?***
-El principio de inversión de dependencias sugiere que los módulos de alto nivel no deberían depender de módulos de bajo nivel; ambos deberían depender de abstracciones. Además, las abstracciones no deberían depender de los detalles; los detalles deberían depender de las abstracciones. 
+El principio de inversión de dependencias sugiere que los módulos de alto nivel no deberían depender de módulos de bajo nivel; ambos deberían depender de abstracciones. Además, las abstracciones no deberían depender de los detalles; los detalles deberían depender de las abstracciones. Esta última frase, enfatiza la idea de que en un buen diseño de software, las interfaces o abstracciones deben ser independientes de las implementaciones específicas. Las implementaciones deben cumplir con las abstracciones, lo que permite que el sistema sea flexible y fácil de extender sin alterar el código existente.
+
+Los módulos de alto nivel (como servicios) y de bajo nivel (como repositorios) deberían depender de abstracciones (interfaces), no entre ellos directamente, lo que hace el código más flexible y fácil de mantener.
+
+***Módulos de alto nivel:*** Los módulos de alto nivel son aquellos que definen la lógica de negocios o las reglas generales del sistema. Estos módulos se encargan de coordinar las tareas más complejas y suelen estar más cerca del usuario final en términos de funcionalidad.
+
+***Módulos de bajo nivel:*** Los módulos de bajo nivel son aquellos que se encargan de tareas más concretas y específicas. Estos módulos son responsables de detalles de implementación como el acceso a la base de datos, cálculos específicos, o interacción con APIs externas.
+
+***Abstracciones:*** Las abstracciones son interfaces o clases que definen un conjunto de métodos o propiedades sin especificar como se deben implementar. Las abstracciones permiten que diferentes partes del código interactúen entre sí sin conocer los detalles de implementación específicos. 
+
+***Resumen:***
+En otras palabras los módulos que definen la lógica de negocio(alto nivel) no deberían estar acoplados directamente con los módulos que realizan tareas específicas y concretas(bajo nivel). En su lugar, ambos deberían depender de interfaces o abstracciones. Esto hace que el sistema sea más flexible, permitiendo cambiar o actualizar las implementaciones de bajo nivel sin afectar la lógica de negocio de alto nivel.
+
+***Ejemplo:***
+
+1. Abstracción: UserRepository (interface)
+2. Módulo de Bajo Nivel: UserRepositoryImpl (implementa UserRepository)
+3. Módulo de Alto Nivel: MicrocreditService (utiliza UserRepository)
+
+```typescript
+//Abstracción
+interface UserRepository{
+    findById(userId:string):User;
+}
+
+//Módulo de bajo nivel
+@Injectable()
+export class UserRepositoryImpl implements UserRepository {
+    findById(userId:string):User{
+        //Implementación específica
+    }
+}
+
+//Módulo de alto nivel
+export class MicrocreditService {
+    constructor(private readonly userRepository:UserRepository){}
+
+    applyForMicrocredit(userId:string, amount:number): Microcredit{
+        const user = this.userRepository.findById(userId);
+        //Lógica para aplicar microcrédito
+    }
+}
+```
+
+Con esta estructura MicrocreditService depende de la asbtracción UserRepository no de una implementación concreta. Si decidimos cambiar UserRepositoryImpl por otra implementación, MicrocreditService no se verá afectado.
+
+
+
+
+
+
+
 
 
