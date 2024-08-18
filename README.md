@@ -285,3 +285,53 @@ Las subclases deben respetar el comportamiento de la clase base, garantizando qu
 Consistencia: Mantener el método apply en la clase base asegura que todas la subclases tengan un comportamiento consistente y predecible.
 
 Extensibilidad sin rotura: Si una subclase necesita extender el comportamiento, puede hacerlo sin alterar el contrato esperado del método apply. Esto permite que las subclases sean utilizadas de manera intercambiable con la clase base sin causar comportamientos inesperados. 
+
+### 4. Principio ISP (Interface Segregation Principle) - Principio de Segregación de Interfaces
+
+***¿Qué es?***
+El principio de segregación de interfaces establece que los clientes no deberían estar forzados a depender de interfaces que no utilizan. Es decir, en lugar de tener una única interfaz grande y general que abarque múltiples funcionalidades, es mejor dividirla en varias interfaces más pequeñas y específicas.
+
+#### Sin ISP (No se debería hacer):
+
+Tenemos una interfaz que define varias operaciones relacionadas con microcréditos,pagos y reportes:
+
+```typescript
+interface MicrocreditOperations {
+    applyForMicrocredit(userId: string, amount: number): void;
+    calculateInterestRate(user:User):number;
+    generateReport(userId:string):Report;
+    processPayment(paymentId: string): void;
+}
+```
+Si un cliente solo necesita aplicar a un microcrédito, se verá obligado a depender de métodos que no utiliza, como generateReport o processPayment.
+
+#### Con ISP (Así se debería hacer):
+
+Aquí segregamos la interfaz anterior en interfaces más pequeñas y específicas:
+
+```typescript
+
+interface MicrocreditApplication{
+    applyForMicrocredit(userId:string, amount:number):void;
+}
+
+interface InterestCalculation {
+    calculateInterestRate(user:User):number;
+}
+
+interface ReportGeneration{
+    generateReport(userId:string):Report;
+}
+
+interface PaymentProcessing{
+    processPayment(paymentId: string): void
+}
+
+```
+
+### 5. Principio DIP (Dependency Inversion Principle ) - Principio de Inversión de Dependencias
+
+***¿Qué es?***
+El principio de inversión de dependencias sugiere que los módulos de alto nivel no deberían depender de módulos de bajo nivel; ambos deberían depender de abstracciones. Además, las abstracciones no deberían depender de los detalles; los detalles deberían depender de las abstracciones. 
+
+
